@@ -1,5 +1,6 @@
 # Agent Foundry
 
+[![Live on Vercel](https://img.shields.io/badge/Live_Demo-agent--foundry--xi.vercel.app-00F0FF?style=flat-square&logo=vercel)](https://agent-foundry-xi.vercel.app)
 [![CI](https://github.com/Jawknee-builds/agent-foundry/actions/workflows/ci.yml/badge.svg)](https://github.com/Jawknee-builds/agent-foundry/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue?style=flat-square)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square)](https://fastapi.tiangolo.com/)

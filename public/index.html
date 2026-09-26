@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Foundry — Typed, Policy-Controlled Agentic Runtime</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090D16;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: #00F0FF;
+      --text: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --accent: #00F0FF;
+      --accent-glow: rgba(0, 240, 255, 0.2);
+      --success: #10B981;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 0;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 4rem 1.5rem; }
+    header { margin-bottom: 3.5rem; text-align: left; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent);
+      color: var(--accent); padding: 0.35rem 0.85rem; border-radius: 9999px;
+      font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 1.25rem; font-family: var(--font-mono);
+    }
+    .badge::before { content: ""; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
+    h1 { font-size: 2.75rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; letter-spacing: -0.02em; }
+    .subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 720px; margin-bottom: 2rem; }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;
+      text-decoration: none; font-size: 0.95rem; transition: all 0.2s ease;
+    }
+    .btn-primary { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0, 240, 255, 0.4); }
+    .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem; }
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem; backdrop-filter: blur(10px);
+    }
+    .card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.75rem; color: #fff; }
+    .card p { color: var(--text-muted); font-size: 0.95rem; }
+    
+    /* Interactive Simulator */
+    .terminal-section {
+      background: #0D1117; border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 3.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .terminal-header {
+      background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
+    }
+    .terminal-dots { display: flex; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #FF5F56; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #27C93F; }
+    .terminal-title { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
+    .terminal-body { padding: 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; }
+    .console-input-row { display: flex; gap: 0.75rem; margin-top: 1rem; align-items: center; }
+    input[type="text"] {
+      flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: #fff; font-family: var(--font-mono); font-size: 0.85rem; padding: 0.6rem 0.85rem;
+      border-radius: 6px; outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    .run-btn {
+      background: var(--accent); color: #000; font-family: var(--font-mono);
+      font-weight: 700; font-size: 0.85rem; padding: 0.6rem 1.25rem; border: none;
+      border-radius: 6px; cursor: pointer;
+    }
+    .console-output {
+      background: rgba(0,0,0,0.4); border-radius: 8px; padding: 1rem; margin-top: 1rem;
+      min-height: 120px; max-height: 250px; overflow-y: auto; color: #A7F3D0;
+      white-space: pre-wrap; font-size: 0.85rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--border); padding-top: 2rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+      color: var(--text-muted); font-size: 0.9rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Production Agentic Runtime</div>
+      <h1>Agent Foundry</h1>
+      <p class="subtitle">A typed, policy-controlled, observable execution runtime for AI tool-using agents. Engineered to eliminate unconstrained side effects.</p>
+      <div class="btn-group">
+        <a href="https://github.com/Jawknee-builds/agent-foundry" class="btn btn-primary" target="_blank">View GitHub Repository</a>
+        <a href="https://jawknee-builds.github.io/systems-casebook/" class="btn btn-secondary" target="_blank">Read Systems Casebook</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h3>🛡 Policy & Schema Enforcement</h3>
+        <p>Every tool call is validated against strict Pydantic schemas before reaching executors. Unregistered tools fail fast at the boundary.</p>
+      </div>
+      <div class="card">
+        <h3>🔍 Dry-Run State Verification</h3>
+        <p>Built-in dry-run execution enables safe testing of planner intent without triggering mutable mutations in external CRMs or ERPs.</p>
+      </div>
+      <div class="card">
+        <h3>📜 Structured Event History</h3>
+        <p>Every transition (Initiate ➔ Plan ➔ Validate ➔ Execute ➔ Complete) emits an immutable trace for observability and audit compliance.</p>
+      </div>
+    </div>
+
+    <div class="terminal-section">
+      <div class="terminal-header">
+        <div class="terminal-dots">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <div class="terminal-title">Interactive Runtime Simulation</div>
+        <div></div>
+      </div>
+      <div class="terminal-body">
+        <p style="color: var(--text-muted);">// Test safety boundary with dry-run verification</p>
+        <div class="console-input-row">
+          <input type="text" id="taskInput" value="Follow up with high-priority lead at Acme Corp">
+          <button class="run-btn" onclick="simulateRun()">Execute Run</button>
+        </div>
+        <div class="console-output" id="output">
+[System Ready] Model connected with deterministic planner.
+Enter a prompt and click 'Execute Run' to test the policy gate.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Architected by <strong>Jonathan Jaladi</strong> &middot; Full-Stack Operator</div>
+      <div><a href="https://github.com/Jawknee-builds">github.com/Jawknee-builds</a> &middot; <a href="mailto:jona247mail@gmail.com">Contact</a></div>
+    </footer>
+  </div>
+
+  <script>
+    function simulateRun() {
+      const task = document.getElementById('taskInput').value;
+      const out = document.getElementById('output');
+      out.textContent = `[Request Ingested] Task: "${task}"\n`;
+      setTimeout(() => {
+        out.textContent += `[State: PLANNING] Parsing intent with schema validation...\n`;
+      }, 300);
+      setTimeout(() => {
+        out.textContent += `[Policy Gate] Tool 'crm_contact_query' validated against allowlist (PASS)\n`;
+        out.textContent += `[Policy Gate] Enforcing dry_run=true mode\n`;
+      }, 700);
+      setTimeout(() => {
+        out.textContent += `[Event Emitted] {"event_id": "evt_${Math.random().toString(36).substring(7)}", "status": "APPROVED", "side_effects": 0}\n`;
+        out.textContent += `\n[Result] 200 OK — Execution Plan Approved without destructive mutations.`;
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
